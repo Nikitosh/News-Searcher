@@ -17,12 +17,17 @@ public class WebCrawlerImpl implements WebCrawler {
         while (!frontier.isFinished()) {
             DomainUrlsSet domainUrlsSet = frontier.getNextDomainUrlsSet();
             String url = domainUrlsSet.popNextUrl();
-            if (permissionsParser.isCrawlingAllowed(url)) {
+            Permissions permissions = permissionsParser.getPermissions(url);
+            if (permissions.isIndexingAllowed() || permissions.isFollowingAllowed()) {
                 UrlInfo urlInfo = parser.parse(url);
-                storage.addDocument(url, urlInfo);
-                List<String> links = urlInfo.getLinks();
-                for (String link : links) {
-                    frontier.addUrl(link);
+                if (permissions.isIndexingAllowed()) {
+                    storage.addDocument(url, urlInfo);
+                }
+                if (permissions.isFollowingAllowed()) {
+                    List<String> links = urlInfo.getLinks();
+                    for (String link : links) {
+                        frontier.addUrl(link);
+                    }
                 }
             }
         }
