@@ -28,7 +28,7 @@ public class CyclicQueueFrontier implements Frontier {
     @Override
     public void addUrl(String url) {
         try {
-            String domain = Parser.getDomainName(url);
+            String domain = ParserHelper.getDomainName(url);
             if (!domainUrlsSets.containsKey(domain)) {
                 domainUrlsSets.put(domain, new InDegreeDomainUrlsSet());
                 domainsQueue.add(domain);
