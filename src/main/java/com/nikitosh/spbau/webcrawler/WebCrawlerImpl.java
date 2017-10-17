@@ -7,7 +7,7 @@ import com.nikitosh.spbau.storage.*;
 import java.util.*;
 
 public class WebCrawlerImpl implements WebCrawler {
-    private Frontier frontier = new InDegreeFrontier();
+    private Frontier frontier = new CyclicQueueFrontier();
     private Parser parser = new ParserImpl();
     private PermissionsParser permissionsParser = new PermissionsParserImpl();
     private Storage storage = new StorageImpl();

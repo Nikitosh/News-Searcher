@@ -9,18 +9,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.net.*;
+
 public interface Parser {
 
     String USER_AGENT = "CrawlerBot";
     int TIMEOUT = 2000;
-
-    UrlInfo parse(String url);
 
     static String getDomainName(String url) throws URISyntaxException {
         URI uri = new URI(url);
         String domain = uri.getHost();
         return domain.startsWith("www.") ? domain.substring(4) : domain;
     }
+
+    UrlInfo parse(String url);
+
 
     static String getWholeText(Document document) {
         return document.body().text();
