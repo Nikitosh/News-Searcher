@@ -8,8 +8,5 @@ public class ParserImpl implements Parser {
         return null;
     }
 
-    @Override
-    public String getDomain(String url) {
-        return null;
-    }
+
 }

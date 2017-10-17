@@ -12,4 +12,16 @@ public class RobotsTxtPermissions {
         this.disallowedUrlMasks = disallowedUrlMasks;
         this.delayInSeconds = delayInSeconds;
     }
+
+    public List<String> getAllowedUrlMasks() {
+        return this.allowedUrlMasks;
+    }
+
+    public List<String> getDisallowedUrlMasks() {
+        return this.disallowedUrlMasks;
+    }
+
+    public int getDelayInSeconds() {
+        return this.delayInSeconds;
+    }
 }
