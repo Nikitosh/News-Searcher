@@ -40,6 +40,11 @@ public class InDegreeDomainUrlsSet implements DomainUrlsSet {
     }
 
     @Override
+    public boolean isEmpty() {
+        return urlReferencesSet.isEmpty();
+    }
+
+    @Override
     public String popNextUrl() {
         UrlReferences urlReferences = urlReferencesSet.last();
         urlReferencesSet.remove(urlReferences);
