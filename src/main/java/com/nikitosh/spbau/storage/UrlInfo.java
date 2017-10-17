@@ -14,6 +14,14 @@ public class UrlInfo {
         this.links = links;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public LocalDateTime getTime() {
+        return time;
+    }
+
     public List<String> getLinks() {
         return links;
     }
