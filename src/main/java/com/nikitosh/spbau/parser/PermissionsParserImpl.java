@@ -1,7 +1,7 @@
 package com.nikitosh.spbau.parser;
 
-import org.apache.logging.log4j.*;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.html.HtmlParser;
 import org.apache.tika.sax.TeeContentHandler;
@@ -12,10 +12,9 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static com.nikitosh.spbau.parser.ParserHelper.getDomainName;
 
 public class PermissionsParserImpl implements PermissionsParser {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -37,6 +36,10 @@ public class PermissionsParserImpl implements PermissionsParser {
     @Override
     public Permissions getPermissions(String url) {
         getRobotsTxtPermissions(url);
+
+        if (!isAllowedLink(url)) {
+            return new Permissions(false, false);
+        }
 
         boolean follow = true;
         boolean index = true;
@@ -74,7 +77,7 @@ public class PermissionsParserImpl implements PermissionsParser {
 
     private void getRobotsTxtPermissions(String url) {
         try {
-            String domainUrl = ParserHelper.getDomainName(url);
+            String domainUrl = getDomainName(url);
             if (!domainPermissions.containsKey(domainUrl)) {
                 addRobotsTxtPermissions(domainUrl);
             }
@@ -129,4 +132,86 @@ public class PermissionsParserImpl implements PermissionsParser {
         }
         domainPermissions.put(url, new RobotsTxtPermissions(allow, disallow, crawlDelay));
     }
+
+    private boolean isAllowedLink(String url) {
+        try {
+            RobotsTxtPermissions permissions = domainPermissions.get(getDomainName(url));
+            List<String> allowedMasks = permissions.getAllowedUrlMasks();
+            List<String> disallowedMasks = permissions.getDisallowedUrlMasks();
+            int disallowMatchLength = 0;
+            int allowMatchLength = 1;
+            for (String mask : disallowedMasks) {
+                if (ruleMatches(url, mask)) {
+                    disallowMatchLength = Math.max(disallowMatchLength, mask.length());
+                }
+            }
+            for (String mask : allowedMasks) {
+                if (ruleMatches(url, mask)) {
+                    allowMatchLength = Math.max(allowMatchLength, mask.length());
+                }
+            }
+            return allowMatchLength > disallowMatchLength;
+        } catch (URISyntaxException e) {
+            LOGGER.error("Failed to get domain name from url: " + url + " due to exception: " + e.getMessage()
+                    + "\n");
+        }
+        return false;
+    }
+
+    private boolean ruleMatches(String text, String pattern) {
+        int patternPos = 0;
+        int textPos = 0;
+
+        int patternEnd = pattern.length();
+        int textEnd = text.length();
+
+        boolean containsEndChar = pattern.endsWith("$");
+        if (containsEndChar) {
+            patternEnd -= 1;
+        }
+        while ((patternPos < patternEnd) && (textPos < textEnd)) {
+            int wildcardPos = pattern.indexOf('*', patternPos);
+            if (wildcardPos == -1) {
+                wildcardPos = patternEnd;
+            }
+            if (wildcardPos == patternPos) {
+                patternPos += 1;
+                if (patternPos >= patternEnd) {
+                    return true;
+                }
+                int patternPieceEnd = pattern.indexOf('*', patternPos);
+                if (patternPieceEnd == -1) {
+                    patternPieceEnd = patternEnd;
+                }
+
+                boolean matched = false;
+                int patternPieceLen = patternPieceEnd - patternPos;
+                while ((textPos + patternPieceLen <= textEnd) && !matched) {
+                    matched = true;
+                    for (int i = 0; i < patternPieceLen && matched; i++) {
+                        if (text.charAt(textPos + i) != pattern.charAt(patternPos + i)) {
+                            matched = false;
+                        }
+                    }
+                    if (!matched) {
+                        textPos += 1;
+                    }
+                }
+                if (!matched) {
+                    return false;
+                }
+            } else {
+                while ((patternPos < wildcardPos) && (textPos < textEnd)) {
+                    if (text.charAt(textPos++) != pattern.charAt(patternPos++)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        while ((patternPos < patternEnd) && (pattern.charAt(patternPos) == '*')) {
+            patternPos += 1;
+        }
+        return (patternPos == patternEnd) && ((textPos == textEnd) || !containsEndChar);
+    }
+
 }

@@ -1,6 +1,8 @@
 package com.nikitosh.spbau.parser;
 
 import com.nikitosh.spbau.storage.UrlInfo;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -8,13 +10,12 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.nikitosh.spbau.parser.ParserHelper.getDocument;
-import static com.nikitosh.spbau.parser.ParserHelper.getLinks;
+import static com.nikitosh.spbau.parser.ParserHelper.*;
 
 public class ParserTASS implements Parser {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String META_NAME = "meta[name]";
     private static final String NAME = "name";
@@ -33,15 +34,18 @@ public class ParserTASS implements Parser {
 
         try {
             Document document = getDocument(url);
-            text = getText(document);
+            //text = getText(document);
+            text = getWholeDocument(document);
             time = getTime(document);
             links = getLinks(document, url);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to get document from url: " + url + " due to exception: " + e.getMessage()
+                    + "\n");
+
         }
 
-        return new UrlInfo(text, time, links);
+        return new UrlInfo(text, links);
     }
 
     private LocalDateTime getTime(Document document) {

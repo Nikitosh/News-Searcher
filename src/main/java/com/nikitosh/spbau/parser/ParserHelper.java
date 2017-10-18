@@ -34,6 +34,10 @@ public final class ParserHelper {
         return document.body().text();
     }
 
+    public static String getWholeDocument(Document document) {
+        return document.toString();
+    }
+
     public static Document getDocument(String url) throws IOException {
         Connection connection = Jsoup.connect(url).userAgent(CRAWLER_BOT).timeout(TIMEOUT);
         return connection.get();

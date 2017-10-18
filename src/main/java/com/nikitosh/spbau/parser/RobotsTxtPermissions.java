@@ -1,6 +1,6 @@
 package com.nikitosh.spbau.parser;
 
-import java.util.*;
+import java.util.List;
 
 public class RobotsTxtPermissions {
     private List<String> allowedUrlMasks;
