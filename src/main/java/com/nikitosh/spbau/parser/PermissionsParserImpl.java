@@ -5,9 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.html.HtmlParser;
 import org.apache.tika.sax.TeeContentHandler;
-import org.jsoup.nodes.Document;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -25,12 +23,6 @@ public class PermissionsParserImpl implements PermissionsParser {
 
     private static final String USER_AGENT = "User-Agent";
     private static final String ROBOTS = "robots";
-    private static final String ROBOTS_TXT = "/robots.txt";
-    private static final String USER_AGENT_TOKEN = "User-agent:";
-    private static final String USER_AGENT_MASK = "*";
-    private static final String DISALLOW_TOKEN = "Disallow:";
-    private static final String ALLOW_TOKEN = "Allow:";
-    private static final String CRAWL_TOKEN = "Crawl-delay:";
     private static final String NOFOLLOW = "nofollow";
     private static final String NOINDEX = "noindex";
     private static final String NONE = "none";
@@ -79,62 +71,18 @@ public class PermissionsParserImpl implements PermissionsParser {
         return new Permissions(index, follow);
     }
 
-    private void getRobotsTxtPermissions(String url) {
+    private RobotsTxtPermissions getRobotsTxtPermissions(String url) {
         try {
             String domainUrl = getDomainName(url);
             if (!domainPermissions.containsKey(domainUrl)) {
-                addRobotsTxtPermissions(domainUrl);
+                domainPermissions.put(domainUrl, RobotsTxtPermissions.from(domainUrl));
             }
+            return domainPermissions.get(domainUrl);
         } catch (URISyntaxException e) {
             LOGGER.error("Failed to get domain name from url: " + url + " due to exception: " + e.getMessage()
                     + "\n");
+            return null;
         }
-    }
-
-    private void addRobotsTxtPermissions(String url) {
-        ArrayList<String> allow = new ArrayList<>();
-        ArrayList<String> disallow = new ArrayList<>();
-        int crawlDelay = -1;
-        String robotsUrl = url + ROBOTS_TXT;
-        try {
-            Document document = ParserHelper.getDocument(robotsUrl);
-            String content = ParserHelper.getWholeText(document);
-            ArrayList<String> tokens = new ArrayList<>(Arrays.asList(content.split(" ")));
-
-            int ind = -1;
-            for (int i = 0; i < tokens.size() - 1; i++) {
-                if (tokens.get(i).equals(USER_AGENT_TOKEN) && tokens.get(i + 1).equals(USER_AGENT_MASK)) {
-                    ind = i + 2;
-                    break;
-                }
-            }
-
-            if (ind != -1) {
-                tokens = new ArrayList<>(tokens.subList(ind, tokens.size()));
-                int nextInd = tokens.indexOf(USER_AGENT_TOKEN);
-                if (nextInd == -1) {
-                    nextInd = tokens.size();
-                }
-                for (int i = 0; i < nextInd; i++) {
-                    switch (tokens.get(i)) {
-                        case DISALLOW_TOKEN:
-                            disallow.add(tokens.get(i + 1));
-                            break;
-                        case ALLOW_TOKEN:
-                            allow.add(tokens.get(i + 1));
-                            break;
-                        case CRAWL_TOKEN:
-                            crawlDelay = Integer.valueOf(tokens.get(i + 1));
-                        default:
-                            break;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("Failed to get data from robots page of url: " + url + " due to exception: "
-                    + e.getMessage() + "\n");
-        }
-        domainPermissions.put(url, new RobotsTxtPermissions(allow, disallow, crawlDelay));
     }
 
     private boolean isAllowedLink(String url) {

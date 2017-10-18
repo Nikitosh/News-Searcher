@@ -20,8 +20,7 @@ public final class ParserHelper {
     private static final String HTTP = "http";
     private static final String WWW = "www.";
 
-    private ParserHelper() {
-    }
+    private ParserHelper() {}
 
     public static String getDomainName(String url) throws URISyntaxException {
         URI uri = new URI(url);
@@ -43,22 +42,22 @@ public final class ParserHelper {
     }
 
     public static List<String> getLinks(Document document, String url) {
-        List<String> res = new ArrayList<>();
-        Elements links = document.select(A_HREF);
-        for (Element el : links) {
-            String newLink = url;
-            String ending = el.attr(HREF);
+        List<String> links = new ArrayList<>();
+        Elements elements = document.select(A_HREF);
+        for (Element element : elements) {
+            String link = url;
+            String ending = element.attr(HREF);
             if (ending.length() > 0 && ending.charAt(0) == '/') {
-                newLink += ending;
+                link += ending;
             } else {
-                if ((ending.length() >= 4 && ending.substring(0, 4).equals(HTTP))) {
-                    newLink = ending;
+                if ((ending.length() >= HTTP.length() && ending.substring(0, 4).equals(HTTP))) {
+                    link = ending;
                 } else {
                     continue;
                 }
             }
-            res.add(newLink);
+            links.add(link);
         }
-        return res;
+        return links;
     }
 }

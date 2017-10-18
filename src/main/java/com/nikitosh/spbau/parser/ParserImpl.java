@@ -14,20 +14,16 @@ public class ParserImpl implements Parser {
 
     @Override
     public UrlInfo parse(String url) {
-
         String text = "";
         List<String> links = new ArrayList<>();
-
         try {
             Document document = ParserHelper.getDocument(url);
             text = ParserHelper.getWholeDocument(document);
             links = ParserHelper.getLinks(document, url);
-
         } catch (IOException e) {
             LOGGER.error("Failed to get document from url: " + url + " due to exception: " + e.getMessage()
                     + "\n");
         }
-
         return new UrlInfo(text, links);
     }
 }
