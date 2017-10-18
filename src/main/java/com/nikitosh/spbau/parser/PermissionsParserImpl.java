@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.nikitosh.spbau.parser.ParserHelper.getDomainName;
-
 public class PermissionsParserImpl implements PermissionsParser {
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -31,7 +29,7 @@ public class PermissionsParserImpl implements PermissionsParser {
 
     @Override
     public Permissions getPermissions(String url) {
-        getRobotsTxtPermissions(url);
+        addRobotsTxtPermissions(url);
 
         if (!isAllowedLink(url)) {
             return new Permissions(false, false);
@@ -71,23 +69,21 @@ public class PermissionsParserImpl implements PermissionsParser {
         return new Permissions(index, follow);
     }
 
-    private RobotsTxtPermissions getRobotsTxtPermissions(String url) {
+    private void addRobotsTxtPermissions(String url) {
         try {
-            String domainUrl = getDomainName(url);
+            String domainUrl = ParserHelper.getDomainName(url);
             if (!domainPermissions.containsKey(domainUrl)) {
                 domainPermissions.put(domainUrl, RobotsTxtPermissions.from(domainUrl));
             }
-            return domainPermissions.get(domainUrl);
         } catch (URISyntaxException e) {
             LOGGER.error("Failed to get domain name from url: " + url + " due to exception: " + e.getMessage()
                     + "\n");
-            return null;
         }
     }
 
     private boolean isAllowedLink(String url) {
         try {
-            RobotsTxtPermissions permissions = domainPermissions.get(getDomainName(url));
+            RobotsTxtPermissions permissions = domainPermissions.get(ParserHelper.getDomainName(url));
             List<String> allowedMasks = permissions.getAllowedUrlMasks();
             List<String> disallowedMasks = permissions.getDisallowedUrlMasks();
             int disallowMatchLength = 0;

@@ -16,7 +16,7 @@ import java.util.List;
 public class StorageImpl implements Storage {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String STORAGE_DIRECTORY = "data";
+    private static final String STORAGE_DIRECTORY = "../data";
     private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
     public StorageImpl() {
@@ -28,6 +28,11 @@ public class StorageImpl implements Storage {
 
     @Override
     public void addDocument(String url, UrlInfo urlInfo) {
+        url = url
+                .replace("http://","")
+                .replace("https://","")
+                .replace("www.","");
+        url = url.replaceAll("[^a-zA-Z0-9.-]", "_");
         Path path = Paths.get(STORAGE_DIRECTORY, url);
         if (!(path.toFile()).exists()) {
             List<String> data = Arrays.asList(urlInfo.getText());

@@ -54,7 +54,6 @@ public class ParserTASS implements Parser {
                 String[] dateParts = content.split(" |-|:");
                 int[] date = new int[dateParts.length];
                 for (int i = 0; i < dateParts.length; i++) {
-                    System.out.println(dateParts[i]);
                     date[i] = Integer.valueOf(dateParts[i]);
                 }
                 time = LocalDateTime.of(date[0], date[1], date[2], date[3], date[4], date[5]);

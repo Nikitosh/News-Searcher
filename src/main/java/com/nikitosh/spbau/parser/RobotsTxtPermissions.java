@@ -17,13 +17,13 @@ public class RobotsTxtPermissions {
     private static final String USER_AGENT_MASK = "*";
     private static final String DISALLOW_TOKEN = "Disallow:";
     private static final String ALLOW_TOKEN = "Allow:";
-    private static final String CRAWL_TOKEN = "Crawl-delay:";
+    private static final String CRAWL_DELAY_TOKEN = "Crawl-delay:";
 
     private List<String> allowedUrlMasks;
     private List<String> disallowedUrlMasks;
-    private int delayInSeconds;
+    private double delayInSeconds;
 
-    public RobotsTxtPermissions(List<String> allowedUrlMasks, List<String> disallowedUrlMasks, int delayInSeconds) {
+    public RobotsTxtPermissions(List<String> allowedUrlMasks, List<String> disallowedUrlMasks, double delayInSeconds) {
         this.allowedUrlMasks = allowedUrlMasks;
         this.disallowedUrlMasks = disallowedUrlMasks;
         this.delayInSeconds = delayInSeconds;
@@ -37,14 +37,14 @@ public class RobotsTxtPermissions {
         return this.disallowedUrlMasks;
     }
 
-    public int getDelayInSeconds() {
+    public double getDelayInSeconds() {
         return this.delayInSeconds;
     }
 
     public static RobotsTxtPermissions from(String url) {
         ArrayList<String> allow = new ArrayList<>();
         ArrayList<String> disallow = new ArrayList<>();
-        int crawlDelay = -1;
+        double crawlDelay = -1;
         String robotsUrl = url + ROBOTS_TXT;
         try {
             Document document = ParserHelper.getDocument(robotsUrl);
@@ -68,13 +68,15 @@ public class RobotsTxtPermissions {
                 for (int i = 0; i < nextInd; i++) {
                     switch (tokens.get(i)) {
                         case DISALLOW_TOKEN:
-                            disallow.add(tokens.get(i + 1));
+                            if (i + 1 < nextInd) {
+                                disallow.add(tokens.get(i + 1));
+                            }
                             break;
                         case ALLOW_TOKEN:
                             allow.add(tokens.get(i + 1));
                             break;
-                        case CRAWL_TOKEN:
-                            crawlDelay = Integer.valueOf(tokens.get(i + 1));
+                        case CRAWL_DELAY_TOKEN:
+                            crawlDelay = Double.valueOf(tokens.get(i + 1));
                         default:
                             break;
                     }
