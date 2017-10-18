@@ -1,6 +1,7 @@
 package com.nikitosh.spbau;
 
-import com.nikitosh.spbau.webcrawler.*;
+import com.nikitosh.spbau.webcrawler.WebCrawler;
+import com.nikitosh.spbau.webcrawler.WebCrawlerImpl;
 
 public final class Main {
     private Main() {}

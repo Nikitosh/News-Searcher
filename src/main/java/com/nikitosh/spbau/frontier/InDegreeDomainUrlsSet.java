@@ -1,6 +1,8 @@
 package com.nikitosh.spbau.frontier;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeSet;
 
 public class InDegreeDomainUrlsSet implements DomainUrlsSet {
     private Map<String, Integer> urlReferencesNumber = new HashMap<>();

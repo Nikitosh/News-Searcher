@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public final class ParserHelper {
     public static final String CRAWLER_BOT = "CrawlerBot";
     public static final int TIMEOUT = 2000;

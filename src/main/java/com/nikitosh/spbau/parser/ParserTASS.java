@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nikitosh.spbau.parser.ParserHelper.*;
-
 public class ParserTASS implements Parser {
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -33,11 +31,10 @@ public class ParserTASS implements Parser {
         List<String> links = new ArrayList<>();
 
         try {
-            Document document = getDocument(url);
-            //text = getText(document);
-            text = getWholeDocument(document);
+            Document document = ParserHelper.getDocument(url);
+            text = ParserHelper.getWholeDocument(document);
             time = getTime(document);
-            links = getLinks(document, url);
+            links = ParserHelper.getLinks(document, url);
 
         } catch (IOException e) {
             LOGGER.error("Failed to get document from url: " + url + " due to exception: " + e.getMessage()

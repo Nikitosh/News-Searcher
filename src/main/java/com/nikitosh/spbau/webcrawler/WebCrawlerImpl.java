@@ -1,10 +1,18 @@
 package com.nikitosh.spbau.webcrawler;
 
-import com.nikitosh.spbau.frontier.*;
-import com.nikitosh.spbau.parser.*;
-import com.nikitosh.spbau.storage.*;
+import com.nikitosh.spbau.frontier.CyclicQueueFrontier;
+import com.nikitosh.spbau.frontier.DomainUrlsSet;
+import com.nikitosh.spbau.frontier.Frontier;
+import com.nikitosh.spbau.parser.Parser;
+import com.nikitosh.spbau.parser.ParserImpl;
+import com.nikitosh.spbau.parser.Permissions;
+import com.nikitosh.spbau.parser.PermissionsParser;
+import com.nikitosh.spbau.parser.PermissionsParserImpl;
+import com.nikitosh.spbau.storage.Storage;
+import com.nikitosh.spbau.storage.StorageImpl;
+import com.nikitosh.spbau.storage.UrlInfo;
 
-import java.util.*;
+import java.util.List;
 
 public class WebCrawlerImpl implements WebCrawler {
     private Frontier frontier = new CyclicQueueFrontier();
