@@ -18,11 +18,12 @@ import java.util.List;
 import java.util.Set;
 
 public class WebCrawlerImpl implements WebCrawler {
-    private Frontier frontier = new CyclicQueueFrontier();
     private Parser parser = new ParserImpl();
     private PermissionsParser permissionsParser = new PermissionsParserImpl();
+    private Frontier frontier = new CyclicQueueFrontier(permissionsParser);
     private Storage storage = new StorageImpl();
     private Set<String> visitedUrls = new HashSet<>();
+
 
     @Override
     public void crawl(List<String> seedUrls) {

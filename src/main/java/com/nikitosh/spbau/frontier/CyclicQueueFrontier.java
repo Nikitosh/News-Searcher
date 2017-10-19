@@ -1,6 +1,7 @@
 package com.nikitosh.spbau.frontier;
 
 import com.nikitosh.spbau.parser.ParserHelper;
+import com.nikitosh.spbau.parser.PermissionsParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,13 +16,20 @@ public class CyclicQueueFrontier implements Frontier {
 
     private Map<String, DomainUrlsSet> domainUrlsSets = new HashMap<>();
     private Queue<String> domainsQueue = new LinkedList<>();
+    private Map<String, Long> domainLastVisitedTime = new HashMap<>();
+    private PermissionsParser permissionsParser;
+
+    public CyclicQueueFrontier(PermissionsParser permissionsParser) {
+        this.permissionsParser = permissionsParser;
+    }
 
     @Override
     public DomainUrlsSet getNextDomainUrlsSet() {
         while (!domainsQueue.isEmpty()) {
             String domain = domainsQueue.remove();
-            if (!domainUrlsSets.get(domain).isEmpty()) {
+            if (!domainUrlsSets.get(domain).isEmpty() && canVisit(domain)) {
                 domainsQueue.add(domain);
+                domainLastVisitedTime.put(domain, System.currentTimeMillis());
                 return domainUrlsSets.get(domain);
             }
             domainsQueue.add(domain);
@@ -52,5 +60,11 @@ public class CyclicQueueFrontier implements Frontier {
             }
         }
         return true;
+    }
+
+    private boolean canVisit(String domain) {
+        return !domainLastVisitedTime.containsKey(domain)
+                || System.currentTimeMillis() >
+                domainLastVisitedTime.get(domain) + permissionsParser.getDelay(domain) * 1000;
     }
 }

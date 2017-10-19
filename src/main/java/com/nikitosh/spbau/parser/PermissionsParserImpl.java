@@ -69,6 +69,19 @@ public class PermissionsParserImpl implements PermissionsParser {
         return new Permissions(index, follow);
     }
 
+    @Override
+    public double getDelay(String url) {
+        addRobotsTxtPermissions(url);
+        try {
+            RobotsTxtPermissions permissions = domainPermissions.get(ParserHelper.getDomainName(url));
+            return permissions.getDelayInSeconds();
+        } catch (URISyntaxException exception) {
+            LOGGER.error("Failed to get domain name from url: " + url + " due to exception: "
+                    + exception.getMessage() + "\n");
+        }
+        return 0;
+    }
+
     private void addRobotsTxtPermissions(String url) {
         try {
             String domainUrl = ParserHelper.getDomainName(url);
