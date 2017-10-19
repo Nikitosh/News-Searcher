@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.TreeSet;
 
 public class InDegreeDomainUrlsSet implements DomainUrlsSet {
+    private static final int MAX_SIZE = 500;
+
     private Map<String, Integer> urlReferencesNumber = new HashMap<>();
     private TreeSet<UrlReferences> urlReferencesSet = new TreeSet<>();
 
@@ -56,7 +58,7 @@ public class InDegreeDomainUrlsSet implements DomainUrlsSet {
 
     @Override
     public void addUrl(String url) {
-        if (!urlReferencesNumber.containsKey(url)) {
+        if (!urlReferencesNumber.containsKey(url) && urlReferencesNumber.size() < MAX_SIZE) {
             updateUrl(url, 1);
         } else {
             int referencesNumber = urlReferencesNumber.get(url);

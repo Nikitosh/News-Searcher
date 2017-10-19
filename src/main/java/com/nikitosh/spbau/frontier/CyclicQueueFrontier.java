@@ -32,7 +32,9 @@ public class CyclicQueueFrontier implements Frontier {
                 domainLastVisitedTime.put(domain, System.currentTimeMillis());
                 return domainUrlsSets.get(domain);
             }
-            domainsQueue.add(domain);
+            if (!domainUrlsSets.isEmpty()) {
+                domainsQueue.add(domain);
+            }
         }
         return null;
     }

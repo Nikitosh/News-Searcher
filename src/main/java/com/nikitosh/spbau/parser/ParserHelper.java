@@ -62,7 +62,6 @@ public final class ParserHelper {
             url = HTTP_HEADER + url;
         }
         Connection connection = Jsoup.connect(url).userAgent(CRAWLER_BOT).timeout(TIMEOUT);
-        System.out.println(url);
         return connection.get();
     }
 
@@ -70,18 +69,23 @@ public final class ParserHelper {
         List<String> links = new ArrayList<>();
         Elements elements = document.select(A_HREF);
         for (Element element : elements) {
-            String link = url;
-            String ending = element.attr(HREF);
-            if (ending.length() > 0 && ending.charAt(0) == '/') {
-                link += ending;
-            } else {
-                if ((ending.length() >= HTTP.length() && ending.substring(0, 4).equals(HTTP))) {
-                    link = ending;
+            try {
+                String link = getDomainName(url);
+                String ending = element.attr(HREF);
+                if (ending.length() > 0 && ending.charAt(0) == '/') {
+                    link += ending;
                 } else {
-                    continue;
+                    if ((ending.length() >= HTTP.length() && ending.substring(0, 4).equals(HTTP))) {
+                        link = ending;
+                    } else {
+                        continue;
+                    }
                 }
+                links.add(link);
+            } catch (URISyntaxException exception) {
+                LOGGER.error("Failed to get domain name from url: " + url + " due to exception: "
+                        + exception.getMessage() + "\n");
             }
-            links.add(link);
         }
         return links;
     }
