@@ -9,8 +9,9 @@ import java.util.List;
 
 public final class Main {
     private static final List<String> SEED_URLS = Arrays.asList(
-            "https://news.google.ru/",
-            "https://news.yandex.ru/"
+            "http://news.yandex.ru/",
+            "http://news.google.ru/",
+            "http://news.mail.ru/"
     );
 
     private Main() {}
