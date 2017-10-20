@@ -26,10 +26,11 @@ public final class ParserHelper {
     private static final String WWW = "www.";
     private static final String HTTP_HEADER = "http://";
 
-    private ParserHelper() {}
+    private ParserHelper() {
+    }
 
     public static String getDomainName(String url) throws URISyntaxException {
-        if(!url.startsWith(HTTP) && !url.startsWith(HTTPS)){
+        if (!url.startsWith(HTTP) && !url.startsWith(HTTPS)) {
             url = HTTP_HEADER + url;
         }
         URI uri = new URI(url);
@@ -62,6 +63,9 @@ public final class ParserHelper {
             url = HTTP_HEADER + url;
         }
         Connection connection = Jsoup.connect(url).userAgent(CRAWLER_BOT).timeout(TIMEOUT);
+        if (connection == null) {
+            return null;
+        }
         return connection.get();
     }
 

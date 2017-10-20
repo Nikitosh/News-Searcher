@@ -20,7 +20,7 @@ public class ParserImpl implements Parser {
             Document document = ParserHelper.getDocument(url);
             text = ParserHelper.getWholeDocument(document);
             links = ParserHelper.getLinks(document, url);
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             LOGGER.error("Failed to get document from url: " + url + " due to exception: " + e.getMessage()
                     + "\n");
         }

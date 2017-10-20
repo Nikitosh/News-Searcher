@@ -48,6 +48,9 @@ public class RobotsTxtPermissions {
         String robotsUrl = url + ROBOTS_TXT;
         try {
             Document document = ParserHelper.getDocument(robotsUrl);
+            if (document == null) {
+                return new RobotsTxtPermissions(allow, disallow, crawlDelay);
+            }
             String content = ParserHelper.getWholeText(document);
             ArrayList<String> tokens = new ArrayList<>(Arrays.asList(content.split(" ")));
 

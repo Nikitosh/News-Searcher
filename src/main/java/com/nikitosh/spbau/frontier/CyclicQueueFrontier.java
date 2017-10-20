@@ -14,6 +14,7 @@ import java.util.Queue;
 public class CyclicQueueFrontier implements Frontier {
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final int THRESHOLD = 10000;
     private Map<String, DomainUrlsSet> domainUrlsSets = new HashMap<>();
     private Queue<String> domainsQueue = new LinkedList<>();
     private Map<String, Long> domainLastVisitedTime = new HashMap<>();
@@ -67,6 +68,6 @@ public class CyclicQueueFrontier implements Frontier {
     private boolean canVisit(String domain) {
         return !domainLastVisitedTime.containsKey(domain)
                 || System.currentTimeMillis() >
-                domainLastVisitedTime.get(domain) + permissionsParser.getDelay(domain) * 1000;
+                domainLastVisitedTime.get(domain) + Math.max(permissionsParser.getDelay(domain) * 1000, THRESHOLD);
     }
 }
