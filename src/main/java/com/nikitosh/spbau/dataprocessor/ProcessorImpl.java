@@ -1,4 +1,4 @@
-package com.nikitosh.spbau.parser;
+package com.nikitosh.spbau.dataprocessor;
 
 
 import de.l3s.boilerpipe.BoilerpipeProcessingException;
@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class ProcessingImpl implements Processing {
+public final class ProcessorImpl implements Processor {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String REGEX = "[^[а-яА-Я]]";
@@ -27,14 +28,14 @@ public final class ProcessingImpl implements Processing {
     private static final Set<String> STOP_WORDS = new HashSet<>();
 
     @Override
-    public List<String> getWordsFromFile(String fileName) {
+    public List<String> getTermsFromFile(File file) {
         if (STOP_WORDS.isEmpty()) {
             fillStopWordsArray();
         }
-        String rawContent = this.getArticleContent(fileName);
-        List<String> rawWordsList = this.getWordsList(rawContent);
-        List<String> rawWordsListWithoutStopWords = this.stopWordsRemoving(rawWordsList);
-        return this.performStemming(rawWordsListWithoutStopWords);
+        String rawContent = getArticleContent(file);
+        List<String> rawWordsList = getWordsList(rawContent);
+        List<String> rawWordsListWithoutStopWords = stopWordsRemoving(rawWordsList);
+        return performStemming(rawWordsListWithoutStopWords);
     }
 
     private void fillStopWordsArray() {
@@ -49,10 +50,10 @@ public final class ProcessingImpl implements Processing {
         }
     }
 
-    private String getArticleContent(String fileName) {
+    private String getArticleContent(File file) {
         StringBuilder allFile = new StringBuilder();
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), LINK_ENCODING));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), LINK_ENCODING));
             String line;
             while ((line = br.readLine()) != null) {
                 allFile.append(line);

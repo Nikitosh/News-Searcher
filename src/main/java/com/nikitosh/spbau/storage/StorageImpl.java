@@ -16,7 +16,8 @@ import java.util.List;
 public class StorageImpl implements Storage {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String STORAGE_DIRECTORY = "../data";
+    public static final String STORAGE_DIRECTORY = "../data";
+
     private static final Charset UTF_8 = StandardCharsets.UTF_8;
     private static final int MIN_CHARACTERS_NUMBER = 50;
 

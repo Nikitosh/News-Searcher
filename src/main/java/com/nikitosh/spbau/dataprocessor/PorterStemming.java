@@ -1,4 +1,4 @@
-package com.nikitosh.spbau.parser;
+package com.nikitosh.spbau.dataprocessor;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

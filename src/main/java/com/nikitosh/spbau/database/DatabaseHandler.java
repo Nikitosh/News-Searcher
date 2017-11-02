@@ -19,19 +19,15 @@ public class DatabaseHandler {
 
     private static final String DATABASE_PATH = "jdbc:sqlite:database/page_attributes.db";
 
-    private static DatabaseHandler instance = null;
-
-    public static synchronized DatabaseHandler getInstance() throws SQLException {
-        if (instance == null)
-            instance = new DatabaseHandler();
-        return instance;
-    }
-
     private Connection connection;
 
-    private DatabaseHandler() throws SQLException {
-        DriverManager.registerDriver(new JDBC());
-        connection = DriverManager.getConnection(DATABASE_PATH);
+    public DatabaseHandler() {
+        try {
+            DriverManager.registerDriver(new JDBC());
+            connection = DriverManager.getConnection(DATABASE_PATH);
+        } catch (SQLException exception) {
+            LOGGER.error("Failed to create database connection due to exception: " + exception.getMessage() + "\n");
+        }
         try (Statement statement = connection.createStatement()) {
             String sql = "CREATE TABLE PageAttributes (" +
                          "id               SERIAL PRIMARY KEY," +
@@ -40,7 +36,6 @@ public class DatabaseHandler {
                          "characters_count INT NOT NULL);";
             statement.executeUpdate(sql);
         }  catch (SQLException exception) {
-            exception.printStackTrace();
             LOGGER.error("Failed to create database table due to exception: " + exception.getMessage() + "\n");
         }
     }
@@ -58,7 +53,6 @@ public class DatabaseHandler {
             return pageAttributes;
 
         } catch (SQLException exception) {
-            exception.printStackTrace();
             LOGGER.error("Failed to get page attributes from database due to exception: " + exception.getMessage()
                     + "\n");
             return Collections.emptyList();
@@ -74,7 +68,6 @@ public class DatabaseHandler {
             statement.setObject(3, pageAttributes.getCharactersCount());
             statement.execute();
         } catch (SQLException exception) {
-            exception.printStackTrace();
             LOGGER.error("Failed to insert in database page attributes from url: " + pageAttributes.getUrl()
                     + " due to exception: " + exception.getMessage() + "\n");
         }
