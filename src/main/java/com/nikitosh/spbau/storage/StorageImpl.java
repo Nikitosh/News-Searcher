@@ -18,6 +18,7 @@ public class StorageImpl implements Storage {
 
     private static final String STORAGE_DIRECTORY = "../data";
     private static final Charset UTF_8 = StandardCharsets.UTF_8;
+    private static final int MIN_CHARACTERS_NUMBER = 50;
 
     public StorageImpl() {
         File directory = new File(STORAGE_DIRECTORY);
@@ -28,10 +29,13 @@ public class StorageImpl implements Storage {
 
     @Override
     public void addDocument(String url, UrlInfo urlInfo) {
+        if (urlInfo.getText() == null || urlInfo.getText().length() < MIN_CHARACTERS_NUMBER) {
+            return;
+        }
         url = url
-                .replace("http://","")
-                .replace("https://","")
-                .replace("www.","");
+                .replace("http://", "")
+                .replace("https://", "")
+                .replace("www.", "");
         url = url.replaceAll("[^a-zA-Z0-9.-]", "_");
         Path path = Paths.get(STORAGE_DIRECTORY, url);
         if (!(path.toFile()).exists()) {

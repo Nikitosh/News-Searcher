@@ -14,7 +14,7 @@ public class ParserImpl implements Parser {
 
     @Override
     public UrlInfo parse(String url) {
-        String text = "";
+        String text = null;
         List<String> links = new ArrayList<>();
         try {
             Document document = ParserHelper.getDocument(url);

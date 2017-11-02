@@ -62,7 +62,7 @@ public final class ParserHelper {
         if (!url.toLowerCase().matches("^\\w+://.*")) {
             url = HTTP_HEADER + url;
         }
-        Connection connection = Jsoup.connect(url).userAgent(CRAWLER_BOT).timeout(TIMEOUT);
+        Connection connection = Jsoup.connect(url).userAgent(CRAWLER_BOT).timeout(TIMEOUT).validateTLSCertificates(false);
         if (connection == null) {
             return null;
         }
@@ -76,7 +76,7 @@ public final class ParserHelper {
             try {
                 String link = getDomainName(url);
                 String ending = element.attr(HREF);
-                if (ending.length() > 0 && ending.charAt(0) == '/') {
+                if (ending.length() > 0 && ending.charAt(0) == '/' && !(ending.length() >= 2 && ending.charAt(1) == '/')) {
                     link += ending;
                 } else {
                     if ((ending.length() >= HTTP.length() && ending.substring(0, 4).equals(HTTP))) {
@@ -84,6 +84,9 @@ public final class ParserHelper {
                     } else {
                         continue;
                     }
+                }
+                if (!link.substring(0, 4).equals(HTTP)) {
+                    link = HTTP_HEADER + link;
                 }
                 links.add(link);
             } catch (URISyntaxException exception) {
