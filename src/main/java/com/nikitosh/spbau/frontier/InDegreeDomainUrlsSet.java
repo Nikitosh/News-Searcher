@@ -1,11 +1,11 @@
 package com.nikitosh.spbau.frontier;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 public class InDegreeDomainUrlsSet implements DomainUrlsSet {
     private static final int MAX_SIZE = 500;
+    private static final int WORD_BONUS = 2;
+    private static final List<String> KEY_LINK_WORDS = Arrays.asList("news", "article", "event", "material", "novost");
 
     private Map<String, Integer> urlReferencesNumber = new HashMap<>();
     private TreeSet<UrlReferences> urlReferencesSet = new TreeSet<>();
@@ -58,12 +58,18 @@ public class InDegreeDomainUrlsSet implements DomainUrlsSet {
 
     @Override
     public void addUrl(String url) {
+        int priority = 1;
         if (!urlReferencesNumber.containsKey(url) && urlReferencesNumber.size() < MAX_SIZE) {
-            updateUrl(url, 1);
+            for (String word : KEY_LINK_WORDS) {
+                if (url.contains(word)) {
+                    priority += WORD_BONUS;
+                }
+            }
+            updateUrl(url, priority);
         } else {
             int referencesNumber = urlReferencesNumber.get(url);
             urlReferencesSet.remove(new UrlReferences(url, referencesNumber));
-            updateUrl(url, referencesNumber + 1);
+            updateUrl(url, referencesNumber + priority);
         }
     }
 
