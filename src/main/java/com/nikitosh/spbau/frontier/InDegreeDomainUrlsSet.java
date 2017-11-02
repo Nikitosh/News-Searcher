@@ -1,6 +1,10 @@
 package com.nikitosh.spbau.frontier;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 public class InDegreeDomainUrlsSet implements DomainUrlsSet {
     private static final int MAX_SIZE = 500;
