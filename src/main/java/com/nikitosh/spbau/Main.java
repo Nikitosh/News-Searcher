@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.nikitosh.spbau.storage.StorageImpl.STORAGE_DIRECTORY;
+import static com.nikitosh.spbau.storage.StorageImpl.STORAGE_DIRECTORY_PATH;
 
 public final class Main {
     private static final List<String> SEED_URLS = Arrays.asList(
@@ -24,6 +24,6 @@ public final class Main {
         WebCrawler webCrawler = new WebCrawlerImpl();
         webCrawler.crawl(SEED_URLS);
         DataHandler dataHandler = new DataHandlerImpl();
-        dataHandler.process(STORAGE_DIRECTORY);
+        dataHandler.process(STORAGE_DIRECTORY_PATH);
     }
 }

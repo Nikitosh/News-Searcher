@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.List;
 
 public class DataHandlerImpl implements DataHandler {
-    Processor processor;
+    Processor processor = new ProcessorImpl();
     DatabaseHandler databaseHandler = new DatabaseHandler();
 
     @Override
