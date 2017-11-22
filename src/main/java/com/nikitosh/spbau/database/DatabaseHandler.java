@@ -17,7 +17,7 @@ import java.util.List;
 public class DatabaseHandler {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String DATABASE_PATH = "jdbc:sqlite:database/page_attributes.db";
+    private static final String DATABASE_PATH = "jdbc:sqlite:../data/page_attributes.db";
 
     private Connection connection;
 
@@ -30,7 +30,7 @@ public class DatabaseHandler {
         }
         try (Statement statement = connection.createStatement()) {
             String sql = "CREATE TABLE PageAttributes (" +
-                         "id               SERIAL PRIMARY KEY," +
+                         "id               INT NOT NULL UNIQUE," +
                          "url              TEXT NOT NULL UNIQUE," +
                          "words_count      INT NOT NULL," +
                          "characters_count INT NOT NULL);";
@@ -46,7 +46,9 @@ public class DatabaseHandler {
             ResultSet resultSet = statement.executeQuery(
                     "SELECT url, words_count, characters_count FROM PageAttributes");
             while (resultSet.next()) {
-                pageAttributes.add(new PageAttributes(resultSet.getString("url"),
+                pageAttributes.add(new PageAttributes(
+                        resultSet.getInt("id"),
+                        resultSet.getString("url"),
                         resultSet.getInt("words_count"),
                         resultSet.getInt("characters_count")));
             }
@@ -61,11 +63,12 @@ public class DatabaseHandler {
 
     public void addPageAttributes(PageAttributes pageAttributes) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO PageAttributes(`url`, `words_count`, `characters_count`) " +
+                "INSERT INTO PageAttributes(`id`, `url`, `words_count`, `characters_count`) " +
                         "VALUES(?, ?, ?)")) {
-            statement.setObject(1, pageAttributes.getUrl());
-            statement.setObject(2, pageAttributes.getWordCount());
-            statement.setObject(3, pageAttributes.getCharactersCount());
+            statement.setObject(1, pageAttributes.getId());
+            statement.setObject(2, pageAttributes.getUrl());
+            statement.setObject(3, pageAttributes.getWordCount());
+            statement.setObject(4, pageAttributes.getCharactersCount());
             statement.execute();
         } catch (SQLException exception) {
             LOGGER.error("Failed to insert in database page attributes from url: " + pageAttributes.getUrl()
