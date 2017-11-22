@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public final class ProcessorImpl implements Processor {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String NOT_LETTERS = "[^[а-яА-Я]]";
+    private static final String NOT_LETTERS = "[^а-яА-Я]";
     private static final String SPACE = " ";
     private static final String STOP_TERMS_PATH = "src/main/resources/stop_terms.txt";
     private static final Charset STOP_TERMS_ENCODING = Charset.forName("windows-1251");
