@@ -16,13 +16,18 @@ import java.util.List;
 public class StorageImpl implements Storage {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String STORAGE_DIRECTORY_PATH = "../data";
+    public static final String DATA_DIRECTORY_PATH = "../data";
+    public static final String HTML_STORAGE_DIRECTORY_PATH = "../data/html";
 
     private static final Charset UTF_8 = StandardCharsets.UTF_8;
     private static final int MIN_CHARACTERS_NUMBER = 50;
 
     public StorageImpl() {
-        File directory = new File(STORAGE_DIRECTORY_PATH);
+        File directory = new File(DATA_DIRECTORY_PATH);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+        directory = new File(HTML_STORAGE_DIRECTORY_PATH);
         if (!directory.exists()) {
             directory.mkdir();
         }
@@ -38,7 +43,7 @@ public class StorageImpl implements Storage {
                 .replace("https://", "")
                 .replace("www.", "");
         url = url.replaceAll("[^a-zA-Z0-9.-]", "_");
-        Path path = Paths.get(STORAGE_DIRECTORY_PATH, url);
+        Path path = Paths.get(HTML_STORAGE_DIRECTORY_PATH, url);
         if (!(path.toFile()).exists()) {
             List<String> data = Arrays.asList(urlInfo.getText());
             try {
