@@ -5,8 +5,8 @@ import java.io.RandomAccessFile;
 import java.util.List;
 
 public class DictionaryEntry {
-    int documentId;
-    List<Integer> occurrencesPositions;
+    private int documentId;
+    private List<Integer> occurrencesPositions;
 
     public DictionaryEntry(int documentId, List<Integer> occurrencesPositions) {
         this.documentId = documentId;
@@ -23,5 +23,9 @@ public class DictionaryEntry {
 
     public int getBytesSize() {
         return (2 + occurrencesPositions.size()) * 4;
+    }
+
+    public int getOccurrencesPositionsSize() {
+        return occurrencesPositions.size();
     }
 }

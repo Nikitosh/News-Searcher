@@ -15,11 +15,10 @@ import java.util.Map;
 public class DataHandlerImpl implements DataHandler {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String INDEX_PATH = "../data/data.index";
-    private static final String DICTIONARY_PATH = "../data/terms.dict";
+    public static final String INDEX_PATH = "../data/data.index";
+    public static final String DICTIONARY_PATH = "../data/terms.dict";
 
     private Processor processor = new ProcessorImpl();
-    private DatabaseHandler databaseHandler = new DatabaseHandler();
     private Map<String, Integer> totalEntriesSize = new HashMap<>();
     private Map<String, Integer> totalEntriesCount = new HashMap<>();
     private Map<String, Integer> documentIds = new HashMap<>();
@@ -35,8 +34,6 @@ public class DataHandlerImpl implements DataHandler {
                 id++;
                 documentIds.put(documentFile.getName(), id);
                 List<String> terms = processor.getTermsFromFile(documentFile);
-                databaseHandler.addPageAttributes(
-                        PageAttributesExtractor.getPageAttributes(id, documentFile.getName(), terms));
                 Map<String, DictionaryEntry> documentInvertedIndex = IndexerHelper.getInvertedIndex(id, terms);
                 for (Map.Entry<String, DictionaryEntry> entry : documentInvertedIndex.entrySet()) {
                     String term = entry.getKey();
@@ -50,13 +47,14 @@ public class DataHandlerImpl implements DataHandler {
         RandomAccessFile indexFile = new RandomAccessFile(INDEX_PATH, "rw");
         File dictionaryFile = new File(DICTIONARY_PATH);
         PrintWriter dictionaryWriter = new PrintWriter(dictionaryFile);
+        dictionaryWriter.println(totalEntriesSize.size());
         for (String term : totalEntriesSize.keySet()) {
             dictionaryWriter.println(term);
             dictionaryWriter.println(currentIndent);
+            dictionaryWriter.println(Math.log(id * 1. / totalEntriesCount.get(term)));
             indexFile.seek(currentIndent);
-            indexFile.writeChars(term);
             indexFile.writeInt(totalEntriesCount.get(term));
-            currentIndent += 2 * term.length() + 4;
+            currentIndent += 4;
             fileIndents.put(term, currentIndent);
             currentIndent += totalEntriesSize.get(term);
         }
@@ -66,13 +64,18 @@ public class DataHandlerImpl implements DataHandler {
                 id = documentIds.get(documentFile.getName());
                 List<String> terms = processor.getTermsFromFile(documentFile);
                 Map<String, DictionaryEntry> documentInvertedIndex = IndexerHelper.getInvertedIndex(id, terms);
+                double vectorLength = 0;
                 for (Map.Entry<String, DictionaryEntry> entry : documentInvertedIndex.entrySet()) {
                     String term = entry.getKey();
+                    vectorLength += Math.pow(entry.getValue().getOccurrencesPositionsSize()
+                            * Math.log(id * 1. / totalEntriesCount.get(term)), 2);
                     long indent = fileIndents.get(term);
                     indexFile.seek(indent);
                     entry.getValue().write(indexFile);
                     fileIndents.put(term, indent + entry.getValue().getBytesSize());
                 }
+                DatabaseHandler.getInstance().addPageAttributes(PageAttributesExtractor.getPageAttributes(
+                        id, documentFile.getName(), terms, Math.sqrt(vectorLength)));
             }
         }
         indexFile.close();

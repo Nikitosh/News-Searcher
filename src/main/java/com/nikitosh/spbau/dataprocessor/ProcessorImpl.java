@@ -28,9 +28,14 @@ public final class ProcessorImpl implements Processor {
 
     @Override
     public List<String> getTermsFromFile(File file) {
+        return getTermsFromString(getArticleContent(file));
+    }
+
+    @Override
+    public List<String> getTermsFromString(String text) {
         try {
+            String rawContent = text.replaceAll(NOT_LETTERS, SPACE);
             Set<String> stopTerms = new HashSet<>(Files.readAllLines(Paths.get(STOP_TERMS_PATH), STOP_TERMS_ENCODING));
-            String rawContent = getArticleContent(file).replaceAll(NOT_LETTERS, SPACE);
             return Arrays.stream(rawContent.split(SPACE))
                     .filter(term -> !term.isEmpty())
                     .filter(term -> !stopTerms.contains(term))
@@ -40,6 +45,7 @@ public final class ProcessorImpl implements Processor {
             LOGGER.error("Failed to fill stop terms list due to exception: " + exception.getMessage() + "\n");
             return Collections.emptyList();
         }
+
     }
 
     private String getArticleContent(File file) {

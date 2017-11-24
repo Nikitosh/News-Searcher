@@ -2,6 +2,8 @@ package com.nikitosh.spbau;
 
 import com.nikitosh.spbau.dataprocessor.DataHandler;
 import com.nikitosh.spbau.dataprocessor.DataHandlerImpl;
+import com.nikitosh.spbau.queryprocessor.QueryProcessor;
+import com.nikitosh.spbau.queryprocessor.QueryProcessorImpl;
 import com.nikitosh.spbau.webcrawler.WebCrawler;
 import com.nikitosh.spbau.webcrawler.WebCrawlerImpl;
 
@@ -22,7 +24,8 @@ public final class Main {
 
     public static void main(String[] args) throws IOException {
         //crawl();
-        process();
+        //process();
+        answerQueries();
     }
 
     private static void crawl() {
@@ -33,5 +36,10 @@ public final class Main {
     private static void process() throws IOException {
         DataHandler dataHandler = new DataHandlerImpl();
         dataHandler.process(HTML_STORAGE_DIRECTORY_PATH);
+    }
+
+    private static void answerQueries() throws IOException {
+        QueryProcessor queryProcessor = new QueryProcessorImpl();
+        queryProcessor.getDocumentsForQuery("трамвайная сеть в петербурге");
     }
 }
