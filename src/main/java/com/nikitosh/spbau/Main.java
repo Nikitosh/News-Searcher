@@ -1,5 +1,6 @@
 package com.nikitosh.spbau;
 
+import com.nikitosh.spbau.database.DatabaseHandler;
 import com.nikitosh.spbau.dataprocessor.DataHandler;
 import com.nikitosh.spbau.dataprocessor.DataHandlerImpl;
 import com.nikitosh.spbau.queryprocessor.QueryProcessor;
@@ -24,7 +25,7 @@ public final class Main {
 
     public static void main(String[] args) throws IOException {
         //crawl();
-        //process();
+        process();
         answerQueries();
     }
 
@@ -40,6 +41,10 @@ public final class Main {
 
     private static void answerQueries() throws IOException {
         QueryProcessor queryProcessor = new QueryProcessorImpl();
-        queryProcessor.getDocumentsForQuery("трамвайная сеть в петербурге");
+        List<Integer> documents = queryProcessor.getDocumentsForQuery("");
+        for (int documentId : documents) {
+            String url = DatabaseHandler.getInstance().getUrlForId(documentId);
+            System.out.println(url);
+        }
     }
 }

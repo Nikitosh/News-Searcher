@@ -55,7 +55,6 @@ public class WebCrawlerImpl implements WebCrawler {
                                 if (!found) {
                                     break;
                                 }
-                                System.out.println(currentThreadNumber);
                                 domainThread.put(domain, threads.get(currentThreadNumber));
                                 increaseCurrentThreadNumber();
                             }
