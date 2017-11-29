@@ -1,5 +1,6 @@
 package com.nikitosh.spbau.storage;
 
+import com.nikitosh.spbau.database.DatabaseHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +24,7 @@ public class StorageImpl implements Storage {
     private static final int MIN_CHARACTERS_NUMBER = 50;
 
     public StorageImpl() {
+        DatabaseHandler.getInstance().createDocumentUrls();
         File directory = new File(DATA_DIRECTORY_PATH);
         if (!directory.exists()) {
             directory.mkdir();
@@ -38,12 +40,13 @@ public class StorageImpl implements Storage {
         if (urlInfo.getText() == null || urlInfo.getText().length() < MIN_CHARACTERS_NUMBER) {
             return;
         }
-        url = url
+        String fileName = url
                 .replace("http://", "")
                 .replace("https://", "")
-                .replace("www.", "");
-        url = url.replaceAll("[^a-zA-Z0-9.-]", "_");
-        Path path = Paths.get(HTML_STORAGE_DIRECTORY_PATH, url);
+                .replace("www.", "")
+                .replaceAll("[^a-zA-Z0-9.-]", "_");
+        Path path = Paths.get(HTML_STORAGE_DIRECTORY_PATH, fileName);
+        DatabaseHandler.getInstance().addDocumentUrl(url, fileName);
         if (!(path.toFile()).exists()) {
             List<String> data = Arrays.asList(urlInfo.getText());
             try {
