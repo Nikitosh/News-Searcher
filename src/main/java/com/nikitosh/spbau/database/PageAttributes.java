@@ -1,17 +1,23 @@
 package com.nikitosh.spbau.database;
 
+import java.util.Date;
+
 public class PageAttributes {
     private int id;
-    private String url;
+    private String fileName;
     private int wordCount;
     private int charactersCount;
+    private Date time;
+    private String title;
     private double length;
 
-    public PageAttributes(int id, String url, int wordCount, int charactersCount, double length) {
+    public PageAttributes(int id, String fileName, int wordCount, int charactersCount, Date time, String title, double length) {
         this.id = id;
-        this.url = url;
+        this.fileName = fileName;
         this.wordCount = wordCount;
         this.charactersCount = charactersCount;
+        this.time = time;
+        this.title = title;
         this.length = length;
     }
 
@@ -19,8 +25,8 @@ public class PageAttributes {
         return id;
     }
 
-    public String getUrl() {
-        return url;
+    public String getFileName() {
+        return fileName;
     }
 
     public int getWordCount() {
@@ -29,6 +35,14 @@ public class PageAttributes {
 
     public int getCharactersCount() {
         return charactersCount;
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public double getLength() {
