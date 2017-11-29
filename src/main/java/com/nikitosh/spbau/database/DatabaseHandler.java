@@ -1,5 +1,6 @@
 package com.nikitosh.spbau.database;
 
+import com.nikitosh.spbau.dataprocessor.TimeExtractor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.sqlite.JDBC;
@@ -14,22 +15,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PageAttributesDatabaseHandler {
+public class DatabaseHandler {
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final String DATABASE_PATH = "jdbc:sqlite:../data/page_attributes.db";
+    private static final String DATABASE_PATH = "jdbc:sqlite:../data/database.db";
 
-    private static PageAttributesDatabaseHandler instance = null;
+    private static DatabaseHandler instance = null;
 
     private Connection connection;
 
-    public static synchronized PageAttributesDatabaseHandler getInstance() {
+    public static synchronized DatabaseHandler getInstance() {
         if (instance == null)
-            instance = new PageAttributesDatabaseHandler();
+            instance = new DatabaseHandler();
         return instance;
     }
 
-    private PageAttributesDatabaseHandler() {
+    private DatabaseHandler() {
         try {
             DriverManager.registerDriver(new JDBC());
             connection = DriverManager.getConnection(DATABASE_PATH);
@@ -45,6 +46,8 @@ public class PageAttributesDatabaseHandler {
                     "file_name        TEXT NOT NULL UNIQUE," +
                     "words_count      INT NOT NULL," +
                     "characters_count INT NOT NULL," +
+                    "time             TEXT," +
+                    "title            TEXT," +
                     "length           REAL NOT NULL);";
             statement.executeUpdate(sql);
         }  catch (SQLException exception) {
@@ -67,13 +70,15 @@ public class PageAttributesDatabaseHandler {
         try (Statement statement = connection.createStatement()) {
             List<PageAttributes> pageAttributes = new ArrayList<PageAttributes>();
             ResultSet resultSet = statement.executeQuery(
-                    "SELECT id, file_name, words_count, characters_count, length FROM PageAttributes");
+                    "SELECT id, file_name, words_count, characters_count, time, title, length FROM PageAttributes");
             while (resultSet.next()) {
                 pageAttributes.add(new PageAttributes(
                         resultSet.getInt("id"),
                         resultSet.getString("file_name"),
                         resultSet.getInt("words_count"),
                         resultSet.getInt("characters_count"),
+                        TimeExtractor.parseDate(resultSet.getString("time")),
+                        resultSet.getString("title"),
                         resultSet.getDouble("length")
                 ));
             }
@@ -88,13 +93,16 @@ public class PageAttributesDatabaseHandler {
 
     public void addPageAttributes(PageAttributes pageAttributes) {
         try (PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO PageAttributes(`id`, `file_name`, `words_count`, `characters_count`, `length`) " +
-                        "VALUES(?, ?, ?, ?, ?)")) {
+                "INSERT INTO PageAttributes(`id`, `file_name`, `words_count`, `characters_count`, `time`, " +
+                        "`title`, `length`) " +
+                        "VALUES(?, ?, ?, ?, ?, ?, ?)")) {
             statement.setObject(1, pageAttributes.getId());
             statement.setObject(2, pageAttributes.getFileName());
             statement.setObject(3, pageAttributes.getWordCount());
             statement.setObject(4, pageAttributes.getCharactersCount());
-            statement.setObject(5, pageAttributes.getLength());
+            statement.setObject(5, TimeExtractor.formatDate(pageAttributes.getTime()));
+            statement.setObject(6, pageAttributes.getTitle());
+            statement.setObject(7, pageAttributes.getLength());
             statement.execute();
         } catch (SQLException exception) {
             LOGGER.error("Failed to insert in database page attributes from filename: " + pageAttributes.getFileName()
@@ -103,8 +111,6 @@ public class PageAttributesDatabaseHandler {
     }
 
     public void addDocumentUrl(String url, String fileName) {
-        System.out.println(url);
-        System.out.println(fileName);
         try (PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO DocumentUrls(`url`, `file_name`) " +
                         "VALUES(?, ?)")) {
@@ -120,13 +126,15 @@ public class PageAttributesDatabaseHandler {
     public PageAttributes getPageAttributesForId(int id) {
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(
-                    "SELECT id, file_name, words_count, characters_count, length FROM PageAttributes WHERE id="
-                            + id);
+                    "SELECT id, file_name, words_count, characters_count, time, title, length FROM PageAttributes "
+                            + "WHERE id=" + id);
             return new PageAttributes(
                     resultSet.getInt("id"),
                     resultSet.getString("file_name"),
                     resultSet.getInt("words_count"),
                     resultSet.getInt("characters_count"),
+                    TimeExtractor.parseDate(resultSet.getString("time")),
+                    resultSet.getString("title"),
                     resultSet.getDouble("length")
             );
         } catch (SQLException exception) {
@@ -142,10 +150,21 @@ public class PageAttributesDatabaseHandler {
                     "SELECT url " +
                          "FROM (DocumentUrls " +
                          "INNER JOIN PageAttributes ON (DocumentUrls.file_name=PageAttributes.file_name)) " +
-                         "WHERE id=" + id);
+                         "WHERE PageAttributes.id=" + id);
             return resultSet.getString("url");
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            LOGGER.error("Failed to get document url from database due to exception: " + exception.getMessage()
+                    + "\n");
+            return null;
+        }
+    }
+
+    public String getUrlForFileName(String fileName) {
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(
+                    "SELECT url FROM DocumentUrls WHERE file_name=\"" + fileName + "\"");
+            return resultSet.getString("url");
+        } catch (SQLException exception) {
             LOGGER.error("Failed to get document url from database due to exception: " + exception.getMessage()
                     + "\n");
             return null;
