@@ -26,6 +26,7 @@ public class DataHandlerImpl implements DataHandler {
 
     @Override
     public void process(String storageDirectoryPath) throws IOException {
+        DatabaseHandler.getInstance().createPageAttributes();
         File directory = new File(storageDirectoryPath);
         File[] files = directory.listFiles();
         int id = 0;
@@ -43,6 +44,7 @@ public class DataHandlerImpl implements DataHandler {
                 }
             }
         }
+
         long currentIndent = 0;
         RandomAccessFile indexFile = new RandomAccessFile(INDEX_PATH, "rw");
         File dictionaryFile = new File(DICTIONARY_PATH);
@@ -59,6 +61,7 @@ public class DataHandlerImpl implements DataHandler {
             currentIndent += totalEntriesSize.get(term);
         }
         dictionaryWriter.close();
+
         for (File documentFile : files) {
             if (documentFile.isFile()) {
                 id = documentIds.get(documentFile.getName());
@@ -74,8 +77,16 @@ public class DataHandlerImpl implements DataHandler {
                     entry.getValue().write(indexFile);
                     fileIndents.put(term, indent + entry.getValue().getBytesSize());
                 }
-                DatabaseHandler.getInstance().addPageAttributes(PageAttributesExtractor.getPageAttributes(
-                        id, documentFile.getName(), terms, Math.sqrt(vectorLength)));
+                String url = DatabaseHandler.getInstance().getUrlForFileName(documentFile.getName());
+                DatabaseHandler.getInstance().addPageAttributes(
+                        PageAttributesExtractor.getPageAttributes(
+                                id,
+                                documentFile.getName(),
+                                terms,
+                                TimeExtractor.getTime(url, documentFile),
+                                TitleExtractor.getTitle(url, documentFile),
+                                Math.sqrt(vectorLength))
+                );
             }
         }
         indexFile.close();
