@@ -1,0 +1,39 @@
+﻿PublishDate
+pubdate
+publish_date
+article__header__date
+rnews:datePublished
+article:published_time
+OriginalPublicationDate
+datePublished
+dateCreated
+og:published_time
+article_date_original
+publication_date
+b-article__info
+news__date
+b-material__date
+post-published
+main-article-time
+news-info
+article-date
+heading innews
+nopi-date
+node_public_date
+page-news-date
+m-date
+date tc
+format-date
+article-entry__meta
+news_full_title
+b-article-header-signature__date
+article_img_item
+fsSmall
+sailthru.date
+mediator_published_time
+slider-time
+entry-date updated td-module-date
+date ff
+_3eSy7
+date
+Date
