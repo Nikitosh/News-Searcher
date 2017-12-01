@@ -41,6 +41,17 @@ public final class ParserHelper {
         return domain.startsWith(WWW) ? domain.substring(WWW.length()) : domain;
     }
 
+    public static String shortenDomainURL(String domainURL) {
+        String[] parts = domainURL.split("\\.");
+        try {
+            return parts[parts.length - 2] + "." + parts[parts.length - 1];
+        } catch (Exception e) {
+            LOGGER.info("Bad domain URL passed " + e.getMessage());
+            return "";
+        }
+    }
+
+
     public static boolean isValidUrl(String url) {
         try {
             new URI(url).getHost();
