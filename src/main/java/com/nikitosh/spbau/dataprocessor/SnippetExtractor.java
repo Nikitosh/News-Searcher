@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -74,5 +76,25 @@ public final class SnippetExtractor {
         return new ArrayList<>();
     }
 
+    private static List<Boolean> colorSnippet(String snippetText, Set<String> queryTermsSet) {
+        List<Boolean> toColor = new ArrayList<>(Arrays.asList(new Boolean[snippetText.length()]));
+        Collections.fill(toColor, false);
+        List<Integer> termsIndices = getTermsIndices(snippetText);
+        System.out.println(termsIndices);
+        for (int i = 0; i < termsIndices.size(); i++) {
+            int startIndex = termsIndices.get(i);
+            int endIndex = snippetText.length();
+            if (i != termsIndices.size() - 1) {
+                endIndex = termsIndices.get(i + 1);
+            }
+            for (String queryTerm : queryTermsSet) {
+                if (snippetText.substring(startIndex, Math.min(endIndex, startIndex + queryTerm.length())).equals(queryTerm)) {
+                    Collections.fill(toColor.subList(startIndex, endIndex), true);
+                    break;
+                }
+            }
+        }
+        return toColor;
+    }
 }
 
