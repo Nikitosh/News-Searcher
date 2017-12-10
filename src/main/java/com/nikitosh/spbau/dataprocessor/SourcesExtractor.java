@@ -70,13 +70,13 @@ public class SourcesExtractor {
             String foundPart = wholeText.substring(positionBegin, positionEnd);
             Pattern pattern = Pattern.compile(HREF_BEGINNING + "[^\"]*\"");
             Matcher matcher = pattern.matcher(foundPart);
-            String mainDomain = ParserHelper.shortenDomainURL(ParserHelper.getDomainName(url));
+            String mainDomain = ParserHelper.shortenDomainUrl(ParserHelper.getDomainName(url));
             List<String> realSourcesLinks = new ArrayList<>();
             while (matcher.find()) {
                 String newGroup = matcher.group();
                 String link = newGroup.substring(HREF_BEGINNING.length(), newGroup.length() - 1);
                 try {
-                    String linkDomain = ParserHelper.shortenDomainURL(ParserHelper.getDomainName(link));
+                    String linkDomain = ParserHelper.shortenDomainUrl(ParserHelper.getDomainName(link));
                     if (!linkDomain.contains(mainDomain) && !BAD_DOMAINS2.contains(linkDomain) &&
                             link.length() - (link.lastIndexOf(linkDomain) + linkDomain.length()) > 1) {
                         realSourcesLinks.add(link);

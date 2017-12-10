@@ -84,7 +84,7 @@ public class TimeExtractor {
 
     public static String formatDate(Date date) {
         if (date == null) {
-            return "null";
+            return "";
         }
         return DATE_FORMAT.format(date);
     }

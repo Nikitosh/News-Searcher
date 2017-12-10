@@ -25,6 +25,9 @@ public final class ParserHelper {
     private static final String HTTPS = "https";
     private static final String WWW = "www.";
     private static final String HTTP_HEADER = "http://";
+    private static final String NOT_LETTERS_AND_DIGITS = "[^а-яА-Яa-zA-Z0-9\\p{Punct}]";
+    private static final String SPACE = " ";
+    private static final String ELLIPSIS = "...";
 
     private ParserHelper() {
     }
@@ -41,8 +44,8 @@ public final class ParserHelper {
         return domain.startsWith(WWW) ? domain.substring(WWW.length()) : domain;
     }
 
-    public static String shortenDomainURL(String domainURL) {
-        String[] parts = domainURL.split("\\.");
+    public static String shortenDomainUrl(String domainUrl) {
+        String[] parts = domainUrl.split("\\.");
         try {
             return parts[parts.length - 2] + "." + parts[parts.length - 1];
         } catch (Exception e) {
@@ -51,6 +54,16 @@ public final class ParserHelper {
         }
     }
 
+    public static String replaceBadSymbols(String text) {
+        return text.replaceAll(NOT_LETTERS_AND_DIGITS, SPACE);
+    }
+
+    public static String cropString(String text, int width) {
+        if (text.length() <= width) {
+            return text;
+        }
+        return text.substring(0, width - 3) + ELLIPSIS;
+    }
 
     public static boolean isValidUrl(String url) {
         try {
