@@ -58,7 +58,6 @@ public final class SnippetExtractor {
         List<Boolean> toColor = Arrays.asList(new Boolean[snippetText.length()]);
         Collections.fill(toColor, false);
         List<Integer> termsIndices = getTermsIndices(snippetText);
-        System.out.println(termsIndices);
         for (int i = 0; i < termsIndices.size(); i++) {
             int startIndex = termsIndices.get(i);
             int endIndex = snippetText.length();

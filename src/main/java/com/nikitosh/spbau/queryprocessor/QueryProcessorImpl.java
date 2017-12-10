@@ -110,7 +110,8 @@ public class QueryProcessorImpl implements QueryProcessor {
                 json.put("time", TimeExtractor.formatDate(pageAttributes.getTime()));
                 json.put("content", snippet);
                 json.put("url", DatabaseHandler.getInstance().getUrlForId(documentId));
-                json.put("isHighlighted", minimumTime.equals(pageAttributes.getTime()) ? 1 : 0);
+                json.put("isHighlighted", minimumTime.equals(pageAttributes.getTime()));
+                json.put("isBold", SnippetExtractor.colorSnippet(snippet, new HashSet<>(terms)));
                 json.put("links", "ria.ru");
             } catch (IOException exception) {
                 LOGGER.error("Failed to get article content from file due to exception: " + exception.getMessage()
