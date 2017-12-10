@@ -6,12 +6,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.nodes.Document;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static com.nikitosh.spbau.dataprocessor.ExtractorHelper.getTermsIndices;
 import static com.nikitosh.spbau.dataprocessor.ExtractorHelper.splitBySpaces;
-
 
 public final class SnippetExtractor {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -51,6 +52,27 @@ public final class SnippetExtractor {
             LOGGER.error("Couldn't make snippet " + e.getMessage());
         }
         return "";
+    }
+
+    public static List<Boolean> colorSnippet(String snippetText, Set<String> queryTermsSet) {
+        List<Boolean> toColor = Arrays.asList(new Boolean[snippetText.length()]);
+        Collections.fill(toColor, false);
+        List<Integer> termsIndices = getTermsIndices(snippetText);
+        System.out.println(termsIndices);
+        for (int i = 0; i < termsIndices.size(); i++) {
+            int startIndex = termsIndices.get(i);
+            int endIndex = snippetText.length();
+            if (i != termsIndices.size() - 1) {
+                endIndex = termsIndices.get(i + 1);
+            }
+            for (String queryTerm : queryTermsSet) {
+                if (snippetText.substring(startIndex, Math.min(endIndex, startIndex + queryTerm.length())).equals(queryTerm)) {
+                    Collections.fill(toColor.subList(startIndex, endIndex), true);
+                    break;
+                }
+            }
+        }
+        return toColor;
     }
 }
 
