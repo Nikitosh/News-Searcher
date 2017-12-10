@@ -2,7 +2,7 @@ package com.nikitosh.spbau;
 
 import com.nikitosh.spbau.dataprocessor.DataHandler;
 import com.nikitosh.spbau.dataprocessor.DataHandlerImpl;
-import com.nikitosh.spbau.ui.NewsSearcherFrame;
+import com.nikitosh.spbau.server.Server;
 import com.nikitosh.spbau.webcrawler.WebCrawler;
 import com.nikitosh.spbau.webcrawler.WebCrawlerImpl;
 
@@ -24,7 +24,7 @@ public final class Main {
     public static void main(String[] args) throws IOException {
         //crawl();
         //process();
-        (new NewsSearcherFrame()).setVisible(true);
+        run();
     }
 
     private static void crawl() {
@@ -35,5 +35,10 @@ public final class Main {
     private static void process() throws IOException {
         DataHandler dataHandler = new DataHandlerImpl();
         dataHandler.process(HTML_STORAGE_DIRECTORY_PATH);
+    }
+
+    private static void run() {
+        Server server = new Server();
+        server.run();
     }
 }
