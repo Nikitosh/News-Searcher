@@ -32,9 +32,9 @@
 				{% for result in results %}                
                 <tr>
                   {% if result.isHighlighted %}
-                    <td ng-style="{'background-color': '#ffff99'}">                  
+                    <td bgcolor="#FFFF99">                  
                   {% else %}
-                    <td ng-style="{'background-color': 'white'}">
+                    <td>
                   {% endif %}                  
                       <h3><a href="{{result.url}}">{{result.title}}</a></h3>
                       <span style="color:gray">{{result.time}}</span>​
