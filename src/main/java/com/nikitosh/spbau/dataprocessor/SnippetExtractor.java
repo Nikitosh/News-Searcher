@@ -21,6 +21,7 @@ public final class SnippetExtractor {
     private static final String SPACE = " ";
     private static final String ELLIPSIS = "...";
     private static final int SNIPPET_SIZE = 20;
+    private static final Processor processor = new ProcessorImpl();
 
     public static String getSnippet(Document document, Set<String> queryTermsSet) {
         try {
@@ -33,10 +34,10 @@ public final class SnippetExtractor {
             int maxCount = 0;
             int resultIndex = SNIPPET_SIZE;
             for (int i = 0; i < wholeTerms.size(); i++) {
-                if (i - SNIPPET_SIZE >= 0 && queryTermsSet.contains((wholeTerms.get(i - SNIPPET_SIZE)))) {
+                if (i - SNIPPET_SIZE >= 0 && queryTermsSet.contains(processor.getTermsFromString(wholeTerms.get(i - SNIPPET_SIZE)).get(0))) {
                     currentCount--;
                 }
-                if (queryTermsSet.contains((wholeTerms.get(i)))) {
+                if (queryTermsSet.contains(processor.getTermsFromString(wholeTerms.get(i)).get(0))) {
                     currentCount++;
                 }
                 if (currentCount > maxCount && i >= SNIPPET_SIZE) {
