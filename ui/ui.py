@@ -1,5 +1,6 @@
 import socket
 import json
+import time
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -10,8 +11,6 @@ socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 socket.connect((HOST, PORT))
 
 def transform_bold(text, is_bold):
-	print(text)
-	print(is_bold)
 	result = ''
 	for i in range(len(text)):
 		if is_bold[i]:
@@ -28,11 +27,16 @@ def index():
 def get_counts():
 	query = request.args['query']
 	socket.sendall(bytes(query + '\n', 'utf-8'))
-	BUFFER_SIZE = 10000
-	results = json.loads(socket.recv(BUFFER_SIZE).decode('utf-8'))
+	BUFFER_SIZE = 1024
+	data = bytearray()
+	while True:
+		cur_data = socket.recv(BUFFER_SIZE)
+		data += cur_data
+		if len(cur_data) < BUFFER_SIZE:
+			break
+	results = json.loads(data.decode('utf-8'))
 	for result in results:
 		result['content'] = transform_bold(result['content'], result['isBold'])
-	#print(results)
 	return render_template('index.html', results=results)
 
 if __name__ == '__main__':
