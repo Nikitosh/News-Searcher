@@ -58,15 +58,23 @@ public final class SnippetExtractor {
     public static List<Boolean> colorSnippet(String snippetText, Set<String> queryTermsSet) {
         List<Boolean> toColor = Arrays.asList(new Boolean[snippetText.length()]);
         Collections.fill(toColor, false);
-        List<Integer> termsIndices = getTermsIndices(snippetText);
+        String cleanSnippetText = snippetText.replaceAll(NOT_LETTERS, SPACE);
+        List<String> wholeTerms = splitBySpaces(cleanSnippetText);
+        List<Integer> termsIndices = getTermsIndices(cleanSnippetText);
         for (int i = 0; i < termsIndices.size(); i++) {
             int startIndex = termsIndices.get(i);
-            int endIndex = snippetText.length();
-            if (i != termsIndices.size() - 1) {
-                endIndex = termsIndices.get(i + 1);
-            }
             for (String queryTerm : queryTermsSet) {
-                if (snippetText.substring(startIndex, Math.min(endIndex, startIndex + queryTerm.length())).equals(queryTerm)) {
+                String processedText = "";
+                try {
+                    processedText = processor.getTermsFromString(wholeTerms.get(i)).get(0);
+                } catch (Exception e) {
+                    LOGGER.info("Empty result of processing " + e.getMessage());
+                }
+                if (processedText.equals(queryTerm)) {
+                    int endIndex = cleanSnippetText.indexOf(SPACE, startIndex);
+                    if (endIndex == -1) {
+                        endIndex = cleanSnippetText.length();
+                    }
                     Collections.fill(toColor.subList(startIndex, endIndex), true);
                     break;
                 }
