@@ -1,6 +1,6 @@
 import socket
 import json
-import time
+import struct
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -30,9 +30,8 @@ def get_counts():
 	BUFFER_SIZE = 1024
 	data = bytearray()
 	while True:
-		cur_data = socket.recv(BUFFER_SIZE)
-		data += cur_data
-		if len(cur_data) < BUFFER_SIZE:
+		data += socket.recv(BUFFER_SIZE)
+		if data.find(bytearray([10])) != -1:
 			break
 	results = json.loads(data.decode('utf-8'))
 	for result in results:
