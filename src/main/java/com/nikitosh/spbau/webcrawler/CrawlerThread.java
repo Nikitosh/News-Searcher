@@ -1,5 +1,6 @@
 package com.nikitosh.spbau.webcrawler;
 
+import com.nikitosh.spbau.dataprocessor.SourcesExtractor;
 import com.nikitosh.spbau.frontier.CyclicQueueFrontier;
 import com.nikitosh.spbau.frontier.DomainUrlsSet;
 import com.nikitosh.spbau.frontier.Frontier;
@@ -55,7 +56,10 @@ public class CrawlerThread extends Thread {
                         for (String link : links) {
                             if (!visitedUrls.contains(link) && ParserHelper.isValidUrl(link)) {
                                 try {
-                                    String domain = ParserHelper.getDomainName(link);
+                                    String domain = ParserHelper.shortenDomainUrl(ParserHelper.getDomainName(link));
+                                    if (SourcesExtractor.isBadDomain(domain)) {
+                                        continue;
+                                    }
                                     if (threadDomains.contains(domain)) {
                                         frontier.addUrl(link);
                                     } else {
