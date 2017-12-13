@@ -27,6 +27,7 @@ public class DataHandlerImpl implements DataHandler {
     @Override
     public void process(String storageDirectoryPath) throws IOException {
         DatabaseHandler.getInstance().createPageAttributes();
+        DatabaseHandler.getInstance().createUrlSources();
         File directory = new File(storageDirectoryPath);
         File[] files = directory.listFiles();
         int id = 0;
@@ -78,6 +79,9 @@ public class DataHandlerImpl implements DataHandler {
                     fileIndents.put(term, indent + entry.getValue().getBytesSize());
                 }
                 String url = DatabaseHandler.getInstance().getUrlForFileName(documentFile.getName());
+                if (url == null) {
+                    url = "";
+                }
                 DatabaseHandler.getInstance().addPageAttributes(
                         PageAttributesExtractor.getPageAttributes(
                                 id,
@@ -87,6 +91,12 @@ public class DataHandlerImpl implements DataHandler {
                                 TitleExtractor.getTitle(url, documentFile),
                                 Math.sqrt(vectorLength))
                 );
+                List<String> sources = SourcesExtractor.getSourcesList(url, documentFile);
+                for (String source : sources) {
+                    System.out.println(url);
+                    System.out.println(source);
+                    DatabaseHandler.getInstance().addUrlSources(source, id);
+                }
             }
         }
         indexFile.close();

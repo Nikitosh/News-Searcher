@@ -4,8 +4,10 @@ import com.nikitosh.spbau.parser.ParserHelper;
 import de.l3s.boilerpipe.extractors.ArticleExtractor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -44,8 +46,9 @@ public class SourcesExtractor {
         }
     }
 
-    public static List<String> getSourcesList(Document document, String url) {
+    public static List<String> getSourcesList(String url, File file) {
         try {
+            Document document = Jsoup.parse(file, "UTF-8", url);
             String wholeText = ParserHelper.getWholeDocument(document);
             String articleText = ArticleExtractor.INSTANCE.getText(wholeText);
             String cleanWholeText = wholeText.replaceAll(NOT_LETTERS, SPACE);
@@ -93,5 +96,9 @@ public class SourcesExtractor {
             LOGGER.error("Couldn't get sources list " + e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    public static boolean isBadDomain(String domain) {
+        return BAD_DOMAINS2.contains(domain);
     }
 }

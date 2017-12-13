@@ -89,7 +89,12 @@ public class QueryProcessorImpl implements QueryProcessor {
 
         list.sort((Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) ->
                 o2.getValue().compareTo(o1.getValue()));
-        List<Integer> documentIds = list.stream().map(Map.Entry::getKey).collect(Collectors.toList());
+        double bestRelevance = list.stream().map(Map.Entry::getValue).max(Double::compareTo).orElse(0.);
+        List<Integer> documentIds = list
+                .stream()
+                .filter(entry -> entry.getValue() > bestRelevance / 2)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
         Date currentMinimumTime = Date.from(Instant.now());
         for (int documentId : documentIds) {
             Date time = DatabaseHandler.getInstance().getPageAttributesForId(documentId).getTime();
@@ -109,10 +114,20 @@ public class QueryProcessorImpl implements QueryProcessor {
                 json.put("title", ParserHelper.cropString(pageAttributes.getTitle(), 60));
                 json.put("time", TimeExtractor.formatDate(pageAttributes.getTime()));
                 json.put("content", snippet);
-                json.put("url", DatabaseHandler.getInstance().getUrlForId(documentId));
+                json.put("url", url);
                 json.put("isHighlighted", minimumTime.equals(pageAttributes.getTime()));
                 json.put("isBold", SnippetExtractor.colorSnippet(snippet, new HashSet<>(terms)));
-                json.put("links", "ria.ru");
+                List<Integer> sources = DatabaseHandler.getInstance().getUrlSources(url);
+                System.out.println(sources
+                        .stream()
+                        //.filter(documentIds::contains)
+                        .map(DatabaseHandler.getInstance()::getUrlForId)
+                        .collect(Collectors.toList()));
+                json.put("links", sources
+                        .stream()
+                        //.filter(documentIds::contains)
+                        .map(DatabaseHandler.getInstance()::getUrlForId)
+                        .collect(Collectors.toList()));
             } catch (IOException exception) {
                 LOGGER.error("Failed to get article content from file due to exception: " + exception.getMessage()
                         + "\n");
