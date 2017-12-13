@@ -47,11 +47,16 @@
                         <br>
                         {% endif %}
                         {{result.content|safe}}
+                        {% if result.links|length != 0 %}
                         <br>
-                        Список ссылающихся:
+                        <br>
+                		Список ссылающихся:
                         <ul>
-                            <li>{{result.links}}</li>
+			                {% for link in result.links %}
+                            <li><a href="{{link}}">{{link}}</a></li>
+                            {% endfor %}
                         </ul>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
