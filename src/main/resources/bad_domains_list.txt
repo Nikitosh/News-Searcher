@@ -3,6 +3,7 @@ yandex.ru
 yandex.net
 google.com
 google.ru
+rambler.ru
 goo.gl
 googleapis.com
 vk.com
