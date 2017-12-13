@@ -1,10 +1,14 @@
 import socket
 import json
-import struct
-from flask import Flask, render_template, request, jsonify
+import sys
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
-HOST = "localhost"
+
+if len(sys.argv) < 2:
+	print('There should be server ip address argument')
+	exit(0)
+HOST = sys.argv[1]
 PORT = 8080
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,4 +43,4 @@ def get_counts():
 	return render_template('index.html', results=results)
 
 if __name__ == '__main__':
-	app.run()
+	app.run()     		
