@@ -35,11 +35,11 @@ public class SourcesExtractor {
     private static final int ARTICLE_INDENT = 15;
     private static final int MAX_SOURCES_NUMBER = 4;
 
-    private static final Set<String> BAD_DOMAINS2;
+    private static final Set<String> BAD_DOMAINS;
 
     static {
         try {
-            BAD_DOMAINS2 = new HashSet<>(Files.readAllLines(Paths.get(BAD_DOMAINS_LIST_PATH)));
+            BAD_DOMAINS = new HashSet<>(Files.readAllLines(Paths.get(BAD_DOMAINS_LIST_PATH)));
         } catch (Exception exception) {
             LOGGER.error("Failed to create list of values due to exception: " + exception.getMessage() + "\n");
             throw new RuntimeException(exception);
@@ -80,7 +80,7 @@ public class SourcesExtractor {
                 String link = newGroup.substring(HREF_BEGINNING.length(), newGroup.length() - 1);
                 try {
                     String linkDomain = ParserHelper.shortenDomainUrl(ParserHelper.getDomainName(link));
-                    if (!linkDomain.contains(mainDomain) && !BAD_DOMAINS2.contains(linkDomain) &&
+                    if (!linkDomain.contains(mainDomain) && !BAD_DOMAINS.contains(linkDomain) &&
                             link.length() - (link.lastIndexOf(linkDomain) + linkDomain.length()) > 1) {
                         realSourcesLinks.add(link);
                     }
@@ -99,6 +99,6 @@ public class SourcesExtractor {
     }
 
     public static boolean isBadDomain(String domain) {
-        return BAD_DOMAINS2.contains(domain);
+        return BAD_DOMAINS.contains(domain);
     }
 }
