@@ -66,6 +66,17 @@ public class DatabaseHandler {
         }
     }
 
+    public void createUrlSources() {
+        try (Statement statement = connection.createStatement()) {
+            String sql = "CREATE TABLE UrlSources (" +
+                    "url TEXT NOT NULL," +
+                    "id  INT NOT NULL);";
+            statement.executeUpdate(sql);
+        }  catch (SQLException exception) {
+            LOGGER.error("Failed to create database table due to exception: " + exception.getMessage() + "\n");
+        }
+    }
+
     public List<PageAttributes> getAllPageAttributes() {
         try (Statement statement = connection.createStatement()) {
             List<PageAttributes> pageAttributes = new ArrayList<PageAttributes>();
@@ -169,5 +180,33 @@ public class DatabaseHandler {
                     + "\n");
             return null;
         }
+    }
+
+    public void addUrlSources(String url, int id) {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO UrlSources(`url`, `id`) " +
+                        "VALUES(?, ?)")) {
+            statement.setObject(1, url);
+            statement.setObject(2, id);
+            statement.execute();
+        } catch (SQLException exception) {
+            LOGGER.error("Failed to insert in database url sources with url: " + url
+                    + " due to exception: " + exception.getMessage() + "\n");
+        }
+    }
+
+    public List<Integer> getUrlSources(String url) {
+        List<Integer> sources = new ArrayList<>();
+        try (Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(
+                    "SELECT id FROM UrlSources WHERE url=\"" + url + "\"");
+            while (resultSet.next()) {
+                sources.add(resultSet.getInt("id"));
+            }
+        } catch (SQLException exception) {
+            LOGGER.error("Failed to get url sources from database due to exception: " + exception.getMessage()
+                    + "\n");
+        }
+        return sources;
     }
 }
