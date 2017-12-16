@@ -40,7 +40,7 @@ def get_counts():
 	results = json.loads(data.decode('utf-8'))
 	for result in results:
 		result['content'] = transform_bold(result['content'], result['isBold'])
-	return render_template('index.html', results=results)
+	return render_template('index.html', results=results, query = query)
 
 if __name__ == '__main__':
 	app.run()     		
